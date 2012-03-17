@@ -1,0 +1,49 @@
+Message Types:
+1. Check In
+2. Check Out
+3. Location
+4. Help
+5. All clear
+6. Status
+
+Message Parts:
+1. Type specifier - Specifies the type of the message
+2. Idntity Specifier - Specifies the identity of the sender
+3. Location Specifier - Specify the location of the sender
+4. Password - Specify the password
+5. Message - Specifies details
+
+Message Specifictions:
+1. Message parts are ordered 
+2. Message parts are seperated by spaces
+3. Each message starts with a token speciying the message type
+4. Each message type has a a specific set of parameters
+
+Element Syntax:
+1. Type specifiers are constat tokens currently defined as:
+        LOCATION    one of "lo,loc,location"
+        CHECKIN     one of "ci,check,checkin,in"
+        CHECKOUT    one of "co,checkout,out"
+        HELP        one of "lp,help,sos,911";
+        ALL_CLEAR   one of "ac,clear,safe"
+        STATUS      one of "status, st"
+2. Iedntity Specifier a 6 digit number starting with the letter followed by 5 numeric digits ie G12345.
+
+
+
+Message Type Specifications:
+1. Check In
+[Check In Token] [Identity Specifier (optional)] [Location]
+2. Check Out 
+[Check Out Token] [Identity Specifier (optional)] [Location (optional)] [Password]
+3.Location
+[Location Token] [Identity Specifier(optional)] [Location]
+4.Help
+[Help Token] [Identity Specifier (optional)] [Message] 
+5. All Clear
+[All Clear Token] [Identity Specifier (optional)] [Password]
+6. Status
+[Status Token] [Identity Specifier (optional)] [Message]
+
+
+ 
