@@ -1,4 +1,5 @@
 <?php defined('SYSPATH') or die('No direct script access.');
+//require_once 'MessageParser.class.php';
 /**
  * smskeepalive Hook - Load All Events
  *
@@ -43,14 +44,18 @@ class smskeepalive {
 	public function _parse_sms()
 	{
 		//the message
-		$message = Event::$data->message;
+		$raw_message = Event::$data->message;
 		$from = Event::$data->message_from;
 		$reporterId = Event::$data->reporter_id;
 		$message_date = Event::$data->message_date;
-
+		
+		$p = new MessageParser($raw_message,null,null);
+        $message_type = $p->getMessageType();
+        $message = $p->getMessage();
+		
 
 		//check to see if we're using the white list, and if so, if our SMSer is whitelisted
-		$num_whitelist = ORM::factory('smskeepalive_whitelist')
+		/*$num_whitelist = ORM::factory('smskeepalive_whitelist')
 		->count_all();
 		if($num_whitelist > 0)
 		{
@@ -63,115 +68,28 @@ class smskeepalive {
 				return;
 			}
 		}
-		
+		*/
 		//the delimiter
-		$delimiter = $this->settings->delimiter;
+		//$delimiter = $this->settings->delimiter;
 		
 		//the code word
-		$code_word = $this->settings->code_word;
+		//$code_word = $this->settings->code_word;
 		
-		
-		//split up the string using the delimiter
-		$message_elements = explode($delimiter, $message);
 		
 		//echo Kohana::debug($message_elements);
 		
-		//check if the message properly exploded
-		$elements_count = count($message_elements);
-		
-		if( $elements_count < 4) //must have code word, lat, lon, title. Which is 4 elements
-		{
-			return;
-		}
-		
-		//check to see if they used the right code word, code word should be first
-		if(strtoupper($message_elements[0]) != strtoupper($code_word))
-		{
-			return;
-		}
-		
-		//start parsing
-		//latitude
-		$lat = strtoupper(trim($message_elements[1]));
-		//check if there's a N or S in here and deal with it
-		$n_pos = stripos($lat, "N");
-		if(!($n_pos === false))
-		{
-			$lat = str_replace("N", "", $lat);
-		}
-		
-		$s_pos = stripos($lat, "S");
-		if(!($s_pos===false))
-		{
-			$lat = str_replace("S", "", $lat);
-			$lat = "-".$lat; //make negative
-		}
-		if(is_numeric($lat))
-		{
-			$lat = floatval($lat);
-		}
-		else
-		{
-			return; //not valid
-		}
-		
+		$lat = '7.77';
 		//longitude
-		$lon = strtoupper(trim($message_elements[2]));
-		//check if there's a W or E in here and deal with it
-		$e_pos = stripos($lon, "E");
-		if(!($e_pos===false))
-		{
-			$lon = str_replace("E", "", $lon);
-		}
-		
-		$w_pos = stripos($lon, "W");
-		if(!($w_pos===false))
-		{
-			$lon = str_replace("W", "", $lon);
-			$lon = "-".$lon; //make negative
-		}
-		if(is_numeric($lon))
-		{
-			$lon = floatval($lon);
-		}
-		else
-		{
-			return; //not valid
-		}
+		$lon = '-9.42';
 		
 		//title
-		$title = trim($message_elements[3]);
-		if($title == "")
-		{
-			return; //need a valid title
-		}
+		$title = $message;
 		
-		$location_description = "";
-		//check and see if we have a textual location
-		if($elements_count >= 5)
-		{
-			$location_description =trim($message_elements[4]);
-		}
-		if($location_description == "")
-		{
-			$location_description = "Sent Via SMS";
-		}
+		$location_description = $p->getLocation();
 		
-		$description = "";
-		//check and see if we have a description
-		if($elements_count >= 6)
-		{
-			$description =$description.trim($message_elements[5]);
-		}
-		$description = $description."\n\r\n\rThis reported was created automatically via SMS.";
+		$description = $message."\n\r\n\rThis reported was created automatically via SMS.";
 		
 		$categories = array();
-		//check and see if we have categories
-		if($elements_count >=7)
-		{
-			$categories = explode(",", $message_elements[6]);
-		}
-		
 		
 		//for testing:
 		/*
@@ -205,6 +123,7 @@ class smskeepalive {
 		$incident->save();
 		
 		//STEP 3: Record Approval
+        //ToDo: depending on message type we create a report or not
 		$verify = new Verify_Model();
 		$verify->incident_id = $incident->id;
 		$verify->user_id = 0;
@@ -229,6 +148,7 @@ class smskeepalive {
 		
 		
 		// STEP 3: SAVE CATEGORIES
+		/*
 		ORM::factory('Incident_Category')->where('incident_id',$incident->id)->delete_all();		// Delete Previous Entries
 		foreach($categories as $item)
 		{
@@ -240,7 +160,7 @@ class smskeepalive {
 				$incident_category->save();
 			}
 		}
-
+        */
 		//don't forget to set incident_id in the message
 		Event::$data->incident_id = $incident->id;
 		Event::$data->save();
