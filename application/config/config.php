@@ -25,7 +25,7 @@ $config['index_page'] = '';
  * TRUE will ping Ushahidi.com for the latest version.
  * FALSE will require you to check manually and do upgrades by hand.
  */
-$config['enable_auto_upgrader'] = TRUE;
+$config['enable_auto_upgrader'] = FALSE;
 
 /**
  * Fake file extension that will be added to all generated URLs. Example: .html
