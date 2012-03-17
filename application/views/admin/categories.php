@@ -202,7 +202,7 @@
 											}
 											else
 											{
-												echo "<img src=\"".url::base()."swatch/?c=".$category_color."&w=30&h=30\">";
+												echo "<img src=\"".url::base()."swatch?c=".$category_color."&w=30&h=30\">";
 											}
 											?>
 											</td>
