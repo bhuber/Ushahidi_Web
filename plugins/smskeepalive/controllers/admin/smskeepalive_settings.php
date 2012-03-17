@@ -2,8 +2,8 @@
 /**
  * SMS Automate Administrative Controller
  *
- * @author	   John Etherton
- * @package	   SMS Automate
+ * @author	   Monitor Squared Team
+ * @package	   SMS KeepAlive
  */
 
 class smskeepalive_settings_Controller extends Admin_Controller
