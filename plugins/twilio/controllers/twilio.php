@@ -2,8 +2,6 @@
 require('Services/Twilio.php');
 
 class Twilio_Controller extends Controller {
-    /* Send SMS via REST API */
-    /* sort of public...can't access over www */
 	private function _get_client()
 	{
 		return new Services_Twilio($config['twilio_sid'], $config['twilio_token']);
