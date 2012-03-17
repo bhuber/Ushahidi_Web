@@ -12,7 +12,7 @@ author website:
 Allows properly formatted SMS messages to be automatically converted into approved reports. Uses a code word to provide some level of security.
 
 == Installation ==
-1. Copy the entire /smsautomate/ directory into your /plugins/ directory.
+1. Copy the entire /smskeepalive/ directory into your /plugins/ directory.
 2. Activate the plugin.
 
 == Changelog ==

@@ -6,7 +6,7 @@
  * LICENSE: This source file is subject to LGPL license 
  * that is available through the world-wide-web at the following URI:
  * http://www.gnu.org/copyleft/lesser.html
- * @author     Ushahidi Team <team@ushahidi.com> 
+ * @author     Monitor Squared Team <monitorsquared@gmail.com>
  * @package    Ushahidi - http://source.ushahididev.com
  * @module     smskeepalive Model  
  * @copyright  Ushahidi - http://www.ushahidi.com

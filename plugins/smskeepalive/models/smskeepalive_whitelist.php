@@ -1,21 +1,21 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 /**
-* Model for smsautomate
+* Model for smskeepalive
  *
  * PHP version 5
  * LICENSE: This source file is subject to LGPL license 
  * that is available through the world-wide-web at the following URI:
  * http://www.gnu.org/copyleft/lesser.html
- * @author     Ushahidi Team <team@ushahidi.com> 
+ * @author     Monitor Squared Team (monitersquared@gmail.com)
  * @package    Ushahidi - http://source.ushahididev.com
- * @module     smsautomate_whitelist Model  
+ * @module     smskeepalive_whitelist Model  
  * @copyright  Ushahidi - http://www.ushahidi.com
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
  */
 
-class Smsautomate_whitelist_Model extends ORM
+class Smskeepalive_whitelist_Model extends ORM
 {
 	
 	// Database table name
-	protected $table_name = 'smsautomate_whitelist';
+	protected $table_name = 'smskeepalive_whitelist';
 }
