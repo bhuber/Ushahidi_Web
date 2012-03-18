@@ -60,15 +60,14 @@ class smskeepalive {
 	public function _parse_sms()
 	{
 		//the message
-		$raw_message = Event::$data->message;
-		$from = Event::$data->message_from;
+		$raw_message = Event::$data->message; #the raw string
+		$from = Event::$data->message_from;#the phone number
 		$reporterId = Event::$data->reporter_id;
 		$message_date = Event::$data->message_date;
 		
 		$p = new MessageParser($raw_message,null,null);
         $message_type = $p->getMessageType();
         $message = $p->getMessage();
-		
 
 		//check to see if we're using the white list, and if so, if our SMSer is whitelisted
 		/*$num_whitelist = ORM::factory('smskeepalive_whitelist')
@@ -85,32 +84,16 @@ class smskeepalive {
 			}
 		}
 		*/
-		//the delimiter
+
 		//$delimiter = $this->settings->delimiter;
-		
-		//the code word
+
 		//$code_word = $this->settings->code_word;
-		
-		
+
 		//echo Kohana::debug($message_elements);
-		
-		//title
-		$title = $message;
-		
 		$location_description = $p->getLocation();
-		
 		$description = $message."\n\r\n\rThis reported was created automatically via SMS.";
-		
 		$categories = array();
-		
-		//for testing:
-		/*
-		echo "lat: ". $lat."<br/>";
-		echo "lon: ". $lon."<br/>";
-		echo "title: ". $title."<br/>";
-		echo "description: ". $description."<br/>";
-		echo "category: ". Kohana::debug($categories)."<br/>";
-		*/
+
 		// STEP 0.9: GET LAT/LON FROM LOCATION	
 		list($lat, $lon) = Geocoder::lat_lon_from_text($location_description);
 		// STEP 1: SAVE LOCATION
@@ -124,45 +107,30 @@ class smskeepalive {
 		$incident = new Incident_Model();
 		$incident->location_id = $location->id;
 		$incident->user_id = 0;
-		$incident->incident_title = $title;
+		$incident->incident_title = $message;
 		$incident->incident_description = $description;
 		$incident->incident_date = $message_date;
-		$incident->incident_dateadd = $message_date;
+		$incident->incident_dateadd = date("Y-m-d H:i:s",time());
 		$incident->incident_mode = 2;
 		// Incident Evaluation Info
 		$incident->incident_active = 1;
 		$incident->incident_verified = 1;
-		//Save
 		$incident->save();
+		//STEP 2.1: don't forget to set incident_id in the message
+		Event::$data->incident_id = $incident->id;
+		Event::$data->save();
 		
 		//STEP 3: Record Approval
-        //ToDo: depending on message type we create a report or not
 		$verify = new Verify_Model();
 		$verify->incident_id = $incident->id;
 		$verify->user_id = 0;
 		$verify->verified_date = date("Y-m-d H:i:s",time());
-		if ($incident->incident_active == 1)
-		{
-			$verify->verified_status = '1';
-		}
-		elseif ($incident->incident_verified == 1)
-		{
-			$verify->verified_status = '2';
-		}
-		elseif ($incident->incident_active == 1 && $incident->incident_verified == 1)
-		{
-			$verify->verified_status = '3';
-		}
-		else
-		{
-			$verify->verified_status = '0';
-		}
+		$verify->verified_status = '3'; # active & verified
 		$verify->save();
 		
-		
-		// STEP 3: SAVE CATEGORIES
+		// TODO STEP 4: SAVE CATEGORIES (get from parser)
 		/*
-		ORM::factory('Incident_Category')->where('incident_id',$incident->id)->delete_all();		// Delete Previous Entries
+		ORM::factory('Incident_Category')->where('incident_id',$incident->id)->delete_all(); // Delete Previous Entries
 		foreach($categories as $item)
 		{
 			if(is_numeric($item))
@@ -174,13 +142,7 @@ class smskeepalive {
 			}
 		}
         */
-		//don't forget to set incident_id in the message
-		Event::$data->incident_id = $incident->id;
-		Event::$data->save();
-		
 	}
-	
-
 }
 
 new smskeepalive;
