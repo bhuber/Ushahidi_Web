@@ -21,7 +21,6 @@ class Geocoder
 		$ch = curl_init();
         $ccTLD = self::get_default_ccTLD();
         $url = 'http://maps.googleapis.com/maps/api/geocode/json?sensor=false&region='.$ccTLD.'&address='.urlencode($text);
-        echo($url);
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, True);
 		$json = curl_exec($ch);
