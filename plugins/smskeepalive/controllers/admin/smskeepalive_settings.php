@@ -29,8 +29,13 @@ class smskeepalive_settings_Controller extends Admin_Controller
 		//create the form array
 		$form = array
 		(
-		        'delimiter' => "",
+		    'delimiter' => "",
 			'code_word' => "",
+			'cat_checkin' => "",
+			'cat_checkout' => "",
+			'cat_help' => "",
+			'cat_clear' => "",
+			'cat_status' => "",
 			'whitelist' => ""
 		);
 		
@@ -49,6 +54,11 @@ class smskeepalive_settings_Controller extends Admin_Controller
 			$post->pre_filter('trim', TRUE);
 			$post->add_rules('delimiter', 'length[1,1]');
 			$post->add_rules('code_word', 'length[1,11]');
+			$post->add_rules('cat_checkin', 'length[1,11]');
+			$post->add_rules('cat_checkout', 'length[1,11]');
+			$post->add_rules('cat_help', 'length[1,11]');
+			$post->add_rules('cat_clear', 'length[1,11]');
+			$post->add_rules('cat_status', 'length[1,11]');
 			
 			 if ($post->validate())
 			{
@@ -58,6 +68,11 @@ class smskeepalive_settings_Controller extends Admin_Controller
 					->find();
 				$settings->delimiter = $post->delimiter;
 				$settings->code_word = $post->code_word;
+				$settings->cat_checkin = $post->cat_checkin;
+				$settings->cat_checkout = $post->cat_checkout;
+				$settings->cat_help = $post->cat_help;
+				$settings->cat_clear = $post->cat_clear;
+				$settings->cat_status = $post->cat_status;
 				$settings->save();
 				$form_saved = TRUE;
 				$form = arr::overwrite($form, $post->as_array());
@@ -65,6 +80,7 @@ class smskeepalive_settings_Controller extends Admin_Controller
 				//do the white list
 				
 				//delete everything in the white list db to make room for the new ones
+				/*
 				ORM::factory('smskeepalive_whitelist')->delete_all();
 				
 				$whitelist = nl2br(trim($post->whitelist));
@@ -79,6 +95,7 @@ class smskeepalive_settings_Controller extends Admin_Controller
 						$whitelist_item->save();
 					}
 				}
+				*/
 			}
 			
 			// No! We have validation errors, we need to show the form again,
@@ -101,9 +118,14 @@ class smskeepalive_settings_Controller extends Admin_Controller
 				->find();
 			$form['delimiter'] = $settings->delimiter;
 			$form['code_word'] = $settings->code_word;
+			$form['cat_checkin'] = $settings->cat_checkin;
+			$form['cat_checkout'] = $settings->cat_checkout;
+			$form['cat_help'] = $settings->cat_help;
+			$form['cat_clear'] = $settings->cat_clear;
+			$form['cat_status'] = $settings->cat_status;
 			
 			//get the white listed numbers
-			$whitelist = "";
+			/*$whitelist = "";
 			$count = 0;
 			$listers = ORM::factory('smskeepalive_whitelist')->find_all();
 			foreach($listers as $item)
@@ -116,6 +138,7 @@ class smskeepalive_settings_Controller extends Admin_Controller
 				$whitelist = $whitelist.$item->phone_number;
 			}
 			$form['whitelist'] = $whitelist;
+			*/
 		}
 		
 		

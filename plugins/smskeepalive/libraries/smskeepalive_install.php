@@ -29,11 +29,22 @@ class smskeepalive_Install {
 	public function run_install()
 	{
 		// Create the database tables.
+		//LOCATION    one of "lo,loc,location"
+        //CHECKIN     one of "ci,check,checkin,in"
+        //CHECKOUT    one of "co,checkout,out"
+        //HELP        one of "lp,help,sos,911";
+        //ALL_CLEAR   one of "ac,clear,safe"
+        //STATUS      one of "status, st"
 		// Also include table_prefix in name
-		$this->db->query('CREATE TABLE IF NOT EXISTS `'.Kohana::config('database.default.table_prefix').'smskeepalive` (
+		$this->db->query('CREATE TABLE IF NOT EXISTS `'.Kohana::config('database.default.table_prefix').'smskeepalive3` (
 				  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 				  `delimiter` varchar(1) NOT NULL,
 				  `code_word` varchar(11) NOT NULL,
+				  `cat_checkin` varchar(11) NOT NULL,
+				  `cat_checkout` varchar(11) NOT NULL,
+				  `cat_help` varchar(11) NOT NULL,
+				  `cat_clear` varchar(11) NOT NULL,
+				  `cat_status` varchar(11) NOT NULL,
 				  PRIMARY KEY (`id`)
 				) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1');
 				
@@ -52,6 +63,11 @@ class smskeepalive_Install {
 			$settings->id = 1;
 			$settings->delimiter = ";";
 			$settings->code_word = "abc";
+			$settings->cat_checkin = "2";
+			$settings->cat_checkout = "3";
+			$settings->cat_help = "1";
+			$settings->cat_clear = "3";
+			$settings->cat_status = "3";
 			$settings->save();
 		}
 		
@@ -62,7 +78,7 @@ class smskeepalive_Install {
 	 */
 	public function uninstall()
 	{
-		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'smskeepalive`');
+		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'smskeepalive3`');
 		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'smskeepalive_whitelist`');
 	}
 }

@@ -121,6 +121,54 @@
 	</div>
 	<br/>
     -->
+    <h2>Category Assignments</h2>
+    <br/>
+	To figure out a category's ID number look at the status bar when mousing over the edit or delete link in the Catgories Manage Page in the
+	administrative interface. This should be located in admin/manage on your Ushahidi site.
+	<br/>
+	<br/>
+	<div class="row">
+		<h4>What category id should be used for messages of type checkin?</h4>
+		<h6 style="margin-top:1px; padding-top:1px;margin-bottom:1px; padding-bottom:1px;">
+			Use the category id, not the category name.
+		</h6>
+		<?php print form::input('cat_checkin', $form['cat_checkin'], ' class="text"'); ?>
+	</div>
+	<br/>
+	<div class="row">
+		<h4>What category id should be used for messages of type checkout?</h4>
+		<h6 style="margin-top:1px; padding-top:1px;margin-bottom:1px; padding-bottom:1px;">
+			Use the category id, not the category name.
+		</h6>
+		<?php print form::input('cat_checkout', $form['cat_checkout'], ' class="text"'); ?>
+	</div>
+	<br/>
+	<div class="row">
+		<h4>What category id should be used for messages of type help?</h4>
+		<h6 style="margin-top:1px; padding-top:1px;margin-bottom:1px; padding-bottom:1px;">
+			Use the category id, not the category name.
+		</h6>
+		<?php print form::input('cat_help', $form['cat_help'], ' class="text"'); ?>
+	</div>
+	<br/>
+	<div class="row">
+		<h4>What category id should be used for messages of type clear?</h4>
+		<h6 style="margin-top:1px; padding-top:1px;margin-bottom:1px; padding-bottom:1px;">
+			Use the category id, not the category name.
+		</h6>
+		<?php print form::input('cat_clear', $form['cat_clear'], ' class="text"'); ?>
+	</div>
+	<br/>
+	<div class="row">
+		<h4>What category id should be used for messages of type status?</h4>
+		<h6 style="margin-top:1px; padding-top:1px;margin-bottom:1px; padding-bottom:1px;">
+			Use the category id, not the category name.
+		</h6>
+		<?php print form::input('cat_status', $form['cat_status'], ' class="text"'); ?>
+	</div>
+	
+	<br/>
+	<!--
 	<div class="row">
 		<h4>White listed phone numbers</h4>
 		<h6 style="margin-top:1px; padding-top:1px;margin-bottom:1px; padding-bottom:1px;">
@@ -129,7 +177,7 @@
 		</h6>
 		<?php print form::textarea('whitelist', $form['whitelist'], ' rows="12" cols="40"') ?>		
 	</div>
-	
+	-->
 	
 	
 	
