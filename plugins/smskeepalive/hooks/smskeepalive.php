@@ -20,8 +20,9 @@ class Geocoder
 	{
 		$ch = curl_init();
         $ccTLD = self::get_default_ccTLD();
-		curl_setopt($ch, CURLOPT_URL, 'http://maps.googleapis.com/maps/api/geocode/json?sensor=false&gl='
-            .$ccTLD.'&address='.urlencode($text));
+        $url = 'http://maps.googleapis.com/maps/api/geocode/json?sensor=false&region='.$ccTLD.'&address='.urlencode($text);
+        echo($url);
+		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, True);
 		$json = curl_exec($ch);
 		curl_close($ch);
@@ -29,7 +30,6 @@ class Geocoder
 		$lat = NULL;
 		$lon = NULL;
         $result = json_decode($json);
-        print_r(Kohana::config('settings.default_country'));
 		if(isset($result->results[0]->geometry))
 		{
 			$lat = $result->results[0]->geometry->location->lat;
@@ -44,15 +44,15 @@ class Geocoder
     public static function get_default_ccTLD()
     {
         $country = ORM::factory('country')
-            ->where('id', Kohana::config('settings.default_country')
+            ->where('id', Kohana::config('settings.default_country'))
             ->find();
-        $iso = strtolower(Util::get_or_get($country[0]->iso, 'US'));
-        $ccTLD = $iso === 'gb' ? 'uk' : $iso;
+        $my_iso = $country->iso;
+        $ccTLD = strtolower($my_iso) === 'gb' ? 'uk' : strtolower($my_iso);
         return $ccTLD;
     }
 }
 
-public class Util
+class Util
 {
     public static function get_or_get(&$check, $alternate = NULL) 
     { 
@@ -129,8 +129,7 @@ class smskeepalive
 		$loc = Geocoder::lat_lon_from_text($location_description);
         $lat = $loc['lat'];
         $lon = $loc['lon'];
-        $pretty_address = isset($loc['result']->results[0]->formatted_address) ? 
-            $loc['result']->results[0]->formatted_address : $location_description;
+        $pretty_address = Util::get_or_get($loc['result']->results[0]->formatted_address, $location_description);
 
 		// STEP 1: SAVE LOCATION
 		$location = new Location_Model();
@@ -167,16 +166,17 @@ class smskeepalive
 		$verify->save();
 		
 		// STEP 4: SAVE CATEGORIES (get from parser)
-	        $categories = ORM::factory("category")
-         		->where('category_title', $message_type)
-           		->find();
-       		if($categories->loaded)
-        	{
-			$incident_category = new Incident_Category_Model();
-			$incident_category->incident_id = $incident->id;
-			$incident_category->category_id = $categories->id;
-			$incident_category->save();           
-        	}//endif
+        $categories = ORM::factory("category")
+            //->where('id', Kohana::config('settings.smskeepalive.category_msg_map')[$message_type])
+            ->where('category_title', $message_type)
+            ->find();
+        if($categories->loaded)
+        {
+            $incident_category = new Incident_Category_Model();
+            $incident_category->incident_id = $incident->id;
+            $incident_category->category_id = $categories->id;
+            $incident_category->save();           
+        }//endif
 	}//endfunc
 }//endclass
 
