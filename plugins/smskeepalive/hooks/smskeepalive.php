@@ -13,6 +13,22 @@
  * @license	   http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
  */
 
+class Geocoder {
+	/* Get lat and lon array from string using Google Geocoding API */
+	public function lat_lon_from_text($text)
+	{
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, 'http://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($text));
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, True);
+		$json = curl_exec($ch);
+		curl_close($ch);
+		$result = json_decode($json);
+		$lat = $result->results->geometry->location->lat;
+		$lon = $result->results->geometry->location->lng;
+		return array($lat, $lon);
+	}
+}
+
 class smskeepalive {
 	
 	/**
@@ -78,10 +94,6 @@ class smskeepalive {
 		
 		//echo Kohana::debug($message_elements);
 		
-		$lat = '7.77';
-		//longitude
-		$lon = '-9.42';
-		
 		//title
 		$title = $message;
 		
@@ -99,7 +111,8 @@ class smskeepalive {
 		echo "description: ". $description."<br/>";
 		echo "category: ". Kohana::debug($categories)."<br/>";
 		*/
-		
+		// STEP 0.9: GET LAT/LON FROM LOCATION	
+		list($lat, $lon) = Geocoder::lat_lon_from_text($location_description);
 		// STEP 1: SAVE LOCATION
 		$location = new Location_Model();
 		$location->location_name = $location_description;
