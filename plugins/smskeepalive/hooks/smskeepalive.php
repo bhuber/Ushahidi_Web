@@ -18,21 +18,17 @@ class Geocoder {
 	public function lat_lon_from_text($text)
 	{
 		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, 
-            'http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address='.urlencode($text));
+		curl_setopt($ch, CURLOPT_URL, 'http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address='.urlencode($text));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, True);
 		$json = curl_exec($ch);
 		curl_close($ch);
-		$result = json_decode($json);
-        //print_r($result);
-        $lat = NULL;
-        $lon = NULL;
-
-        if (isset($result->results->geometry->location))
-        {
-            $lat = $result->results->geometry->location->lat;
-            $lon = $result->results->geometry->location->lng;
-        }
+		$lat = null;
+		$lon = null;
+		if(isset($result->results->geometry)):
+			$result = json_decode($json);
+			$lat = $result->results->geometry->location->lat;
+			$lon = $result->results->geometry->location->lng;
+		endif;
 		return array($lat, $lon);
 	}
 }
@@ -74,8 +70,8 @@ class smskeepalive {
 		$message_date = Event::$data->message_date;
 		
 		$p = new MessageParser($raw_message,null,null);
-        $message_type = $p->getMessageType();
-        $message = $p->getMessage();
+	        $message_type = $p->getMessageType();
+      		$message = $p->getMessage();
 
 		//check to see if we're using the white list, and if so, if our SMSer is whitelisted
 		/*$num_whitelist = ORM::factory('smskeepalive_whitelist')
@@ -100,7 +96,6 @@ class smskeepalive {
 		//echo Kohana::debug($message_elements);
 		$location_description = $p->getLocation();
 		$description = $message."\n\r\n\rThis reported was created automatically via SMS.";
-		$categories = array();
 
 		// STEP 0.9: GET LAT/LON FROM LOCATION	
 		list($lat, $lon) = Geocoder::lat_lon_from_text($location_description);
@@ -140,16 +135,16 @@ class smskeepalive {
 		$verify->save();
 		
 		// STEP 4: SAVE CATEGORIES (get from parser)
-        $categories = ORM::factory("category")
-            ->where('category_title', $message_type)
-            ->find();
-        if($categories->loaded)
-        {
+	        $categories = ORM::factory("category")
+         		->where('category_title', $message_type)
+           		->find();
+       		if($categories->loaded)
+        	{
 			$incident_category = new Incident_Category_Model();
 			$incident_category->incident_id = $incident->id;
 			$incident_category->category_id = $categories->id;
 			$incident_category->save();           
-        }//endif
+        	}//endif
 	}//endfunc
 }//endclass
 

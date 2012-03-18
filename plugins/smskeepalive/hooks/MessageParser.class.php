@@ -1,7 +1,6 @@
 <?php
     class MessageParser
     {
-
         /*
         A parser for  messages 
         messages are ordered strings
@@ -74,7 +73,7 @@
             $elements = explode(" ", $message);
             $this->message_type=self::find_message_type($elements[0]);
             if (!$this->message_type){
-                throw new Exception(ERROR_INVALID_MESSAGE);
+                throw new Exception(self::ERROR_INVALID_MESSAGE);
             }
 
             switch ($this->message_type)
@@ -89,8 +88,8 @@
                     {
                         $locationStartIndex=1;
                     }
-                    for ($i = $locationStartIndex; $i<=count($elements); $i++){
-                        $this->location.=$elements[$i]." ";
+                    for ($i = $locationStartIndex; $i < count($elements); $i++){
+                        $this->location .= $elements[$i]." ";
                     }
                     $this->location=trim($this->location);
                     break;
@@ -130,7 +129,7 @@
                     $this->location=trim($this->location);
                     break;
                 case (self::TYPE_HELP):
-                case (self:: TYPE_STATUS):
+                case (self::TYPE_STATUS):
                     if ($elements[1] && preg_match(self::REGEX_IDENTITY, $elements[1]))
                     { 
                         $this->identifier=$elements[1];
