@@ -96,6 +96,7 @@ class smskeepalive {
 
 		// STEP 0.9: GET LAT/LON FROM LOCATION	
 		list($lat, $lon) = Geocoder::lat_lon_from_text($location_description);
+
 		// STEP 1: SAVE LOCATION
 		$location = new Location_Model();
 		$location->location_name = $location_description;
@@ -103,6 +104,7 @@ class smskeepalive {
 		$location->longitude = $lon;
 		$location->location_date = $message_date;
 		$location->save();
+
 		//STEP 2: Save the incident
 		$incident = new Incident_Model();
 		$incident->location_id = $location->id;
@@ -116,6 +118,7 @@ class smskeepalive {
 		$incident->incident_active = 1;
 		$incident->incident_verified = 1;
 		$incident->save();
+
 		//STEP 2.1: don't forget to set incident_id in the message
 		Event::$data->incident_id = $incident->id;
 		Event::$data->save();
