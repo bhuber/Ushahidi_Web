@@ -31,7 +31,6 @@
         CONST ERROR_INVALID_MESSAGE   ="Message is invalid - type not recognized";
 
 
-
         private $raw_message;
         private $message_type;
         private $identifier;
@@ -43,7 +42,6 @@
         {
             return $this->raw_message;
         }
-
 
         public function getMessageType()
         {

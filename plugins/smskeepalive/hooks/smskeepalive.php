@@ -128,21 +128,18 @@ class smskeepalive {
 		$verify->verified_status = '3'; # active & verified
 		$verify->save();
 		
-		// TODO STEP 4: SAVE CATEGORIES (get from parser)
-		/*
-		ORM::factory('Incident_Category')->where('incident_id',$incident->id)->delete_all(); // Delete Previous Entries
-		foreach($categories as $item)
-		{
-			if(is_numeric($item))
-			{
-				$incident_category = new Incident_Category_Model();
-				$incident_category->incident_id = $incident->id;
-				$incident_category->category_id = $item;
-				$incident_category->save();
-			}
-		}
-        */
-	}
-}
+		// STEP 4: SAVE CATEGORIES (get from parser)
+        $categories = ORM::factory("category")
+            ->where($message_type, 1)
+            ->find();
+        if($categories->loaded)
+        {
+			$incident_category = new Incident_Category_Model();
+			$incident_category->incident_id = $incident->id;
+			$incident_category->category_id = $categories->id;
+			$incident_category->save();           
+        }//endif
+	}//endfunc
+}//endclass
 
 new smskeepalive;
