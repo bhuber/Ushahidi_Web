@@ -31,6 +31,8 @@ class Twilio_Controller extends Controller {
         /* Receive SMS GET request and return TwiML */
 	public function sms()
 	{
+		sms::add($_GET['From'], $_GET['Body']);
+		
 		$view = View::factory('twilio/sms_response');
 		$view->ip_address = $_SERVER['REMOTE_ADDR'];
 		$view->render(TRUE);

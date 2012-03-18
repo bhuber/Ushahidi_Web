@@ -8,15 +8,12 @@ class twilio {
  
     public function add()
     {
-	    // Hook into main_sidebar event and call the twilio method
-   	 Event::add('ushahidi_action.main_sidebar', array($this, 'twilio'));
+		plugin::add_sms_provider("twilio");
     }
  
     public function twilio()
-    {
-        // Print the words 'Hello World' in the front page side bar
-        #echo "Hello World!!!";
-	View::factory('twilio/myhtml')->render(TRUE);
+    { # can prob get rid of this later
+	    View::factory('twilio/myhtml')->render(TRUE);
     }
  
 }
