@@ -24,11 +24,13 @@ class Geocoder {
 		curl_close($ch);
 		$lat = null;
 		$lon = null;
-		if(isset($result->results->geometry)):
-			$result = json_decode($json);
-			$lat = $result->results->geometry->location->lat;
-			$lon = $result->results->geometry->location->lng;
-		endif;
+		$result = json_decode($json);
+		if(isset($result->results[0]->geometry))
+		{
+			$lat = $result->results[0]->geometry->location->lat;
+			$lon = $result->results[0]->geometry->location->lng;
+		}
+		print_r(array($lat, $lon));
 		return array($lat, $lon);
 	}
 }
