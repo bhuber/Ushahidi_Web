@@ -21,7 +21,7 @@ class Geocoder
 		$ch = curl_init();
         $ccTLD = self::get_default_ccTLD();
         $url = 'http://maps.googleapis.com/maps/api/geocode/json?sensor=false&region='.$ccTLD.'&address='.urlencode($text);
-        echo($url);
+        //echo($url);
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, True);
 		$json = curl_exec($ch);
@@ -91,15 +91,15 @@ class smskeepalive
 	public function _parse_sms()
 	{
 		//the message
-		$raw_message = Event::$data->message; #the raw string
-		$from = Event::$data->message_from;#the phone number
-		$reporterId = Event::$data->reporter_id;
+		$raw_message = Event::$data->message;       //the raw string
+		$from = Event::$data->message_from;         //the phone number
+		$reporterId = Event::$data->reporter_id;    //primary key into reporter table
 		$message_date = Event::$data->message_date;
 		
 		$p = new MessageParser($raw_message,null,null);
-	        $message_type = $p->getMessageType();
-      		#$message = $p->getMessage();
-		$message = $raw_message;		
+        $message_type = $p->getMessageType();
+		$message = $raw_message;		            //Actual message text
+        $userid = 0;
 
 		//check to see if we're using the white list, and if so, if our SMSer is whitelisted
 		/*$num_whitelist = ORM::factory('smskeepalive_whitelist')
@@ -123,13 +123,19 @@ class smskeepalive
 
 		//echo Kohana::debug($message_elements);
 		$location_description = $p->getLocation();
-		$description = $message."\n\r\n\rThis reported was created automatically via SMS.";
+		$description = "Message text:\'".$message."\'\n\nThis reported was created automatically via SMS.";
 
 		// STEP 0.9: GET LAT/LON FROM LOCATION	
 		$loc = Geocoder::lat_lon_from_text($location_description);
         $lat = $loc['lat'];
         $lon = $loc['lon'];
         $pretty_address = Util::get_or_get($loc['result']->results[0]->formatted_address, $location_description);
+        $got_location = true;
+        if ($lat == NULL || $lon == NULL)
+        {
+            $description = "\nCould not determine location from message".$description;
+            $got_location = false;
+        }
 
 		// STEP 1: SAVE LOCATION
 		$location = new Location_Model();
@@ -141,8 +147,33 @@ class smskeepalive
 
 		//STEP 2: Save the incident
 		$incident = new Incident_Model();
-		$incident->location_id = $location->id;
-		$incident->user_id = 0;
+        $last_location_id = $location->id;
+		$last_message = ORM::factory('message')
+            ->where(array('reporter_id' => $reporterId))
+            ->orderby(array('message_date' => 'DESC'))
+            ->find();
+        if ($last_message->loaded == true)
+        {
+            $last_incident = ORM::factory('incident')
+                ->where('id', $last_message->incident_id)
+                ->find();
+            if ($last_incident->loaded == true)
+            {
+                $last_location_id = $last_incident->location_id;
+                $incident = $last_incident;
+            }
+        }
+            /*
+        $incidents = ORM::factory('incident')
+            ->with('message')->with('reporter')
+            ->where(array('reporter_id' => $reporterID, 'user_id' => $userid))
+            ->orderby(array('indident_date' => 'DESC'))
+            ->limit(10)
+            */
+        //TODO: location isn't using old version ($last_location_id) when not specified, figure out why
+		$incident->location_id = $got_location ? 
+            $location->id : $last_location_id;
+		$incident->user_id = $userid;
 		$incident->incident_title = $message;
 		$incident->incident_description = $description;
 		$incident->incident_date = $message_date;
