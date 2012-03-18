@@ -27,6 +27,48 @@
 	<?php } ?>
 
 <h4> 
+    <br/> There are six types of messages this plugin accepts:
+    <ol>
+        <li>Check in - Start monitoring the sender</li>
+        <li>Check out - Stop monitoring the sender</li>
+        <li>Status - Used to send generic information about the sender's status</li>
+        <li>Location - Update the sender's last known location</li>
+        <li>Help - Indicates the sender is in need of assistance, notifies necessary people</li>
+        <li>All clear - Cancels a help request</li>
+    </ol>
+
+    Messages consist of the following parts:
+    <ol>
+        <li>LOCATION    one of "lo,loc,location"</li>
+        <li>CHECKIN     one of "ci,check,checkin,check in,in"</li>
+        <li>CHECKOUT    one of "co,checkout,check out,out"</li>
+        <li>HELP        one of "lp,help,sos,911";</li>
+        <li>ALL_CLEAR   one of "ac,clear,safe"</li>
+        <li>STATUS      one of "status, st"</li>
+    </ol>
+
+
+    Each must be in one of the following formats:
+    <ol>
+    <?php
+        $template = '<li><div><em>%s:</em><br/>%s</div></li>';
+        $msgs = array(
+            array('Check In', '[Check In Token] [Identity Specifier (optional)] [Location]'),
+            array('Check Out ', '[Check Out Token] [Identity Specifier (optional)] [Location (optional)] [Password]'),
+            array('Location', '[Location Token] [Identity Specifier(optional)] [Location]'),
+            array('Help', '[Help Token] [Identity Specifier (optional)] [Message] '),
+            array('All Clear', '[All Clear Token] [Identity Specifier (optional)] [Password]'),
+            array('Status', '[Status Token] [Identity Specifier (optional)] [Message]')
+            );
+
+        foreach($msgs as $msg)
+        {
+            echo(sprintf($template, $msg[0], $msg[1]));
+        }
+    ?>
+    </ol>
+
+    <!--
 	<br/> For incoming SMS messages to work with this plugin the following format and ordering must be used.<br/>
 	
 	<div style="padding:10px;margin:20px; font-style:italic; border: 1px solid black;"> &lt;Code Word&gt;&lt;delimiter&gt;
@@ -51,12 +93,14 @@
 	<br/> Please becareful with these settings, choosing an easy to guess code word 
 	will make your site an easy target for malicious groups wishing to spread mis-information. Also by choosing a delimiter 
 	that may be used in the message you run the risk of having malformed SMS messages that can't be properly read.
+    -->
 <h4>
 <br/>
 <br/>
 
 
 <div>
+    <!--
 	<div class="row">
 		
 		<h4>What character should be the delimiter between fields in a text message?</h4>
@@ -76,6 +120,7 @@
 		
 	</div>
 	<br/>
+    -->
 	<div class="row">
 		<h4>White listed phone numbers</h4>
 		<h6 style="margin-top:1px; padding-top:1px;margin-bottom:1px; padding-bottom:1px;">

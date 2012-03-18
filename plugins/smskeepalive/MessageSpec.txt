@@ -22,12 +22,12 @@ Message Specifictions:
 Element Syntax:
 1. Type specifiers are constat tokens currently defined as:
         LOCATION    one of "lo,loc,location"
-        CHECKIN     one of "ci,check,checkin,in"
-        CHECKOUT    one of "co,checkout,out"
+        CHECKIN     one of "ci,check,checkin,check in,in"
+        CHECKOUT    one of "co,checkout,check out,out"
         HELP        one of "lp,help,sos,911";
         ALL_CLEAR   one of "ac,clear,safe"
         STATUS      one of "status, st"
-2. Iedntity Specifier a 6 digit number starting with the letter followed by 5 numeric digits ie G12345.
+2. Identity Specifier a 6 digit number starting with the letter followed by 5 numeric digits ie G12345.
 
 
 
