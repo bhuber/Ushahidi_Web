@@ -165,18 +165,42 @@ class smskeepalive
 		$verify->verified_status = '3'; # active & verified
 		$verify->save();
 		
-		// STEP 4: SAVE CATEGORIES (get from parser)
-        $categories = ORM::factory("category")
-            //->where('id', Kohana::config('settings.smskeepalive.category_msg_map')[$message_type])
-            ->where('category_title', $message_type)
-            ->find();
-        if($categories->loaded)
+		// STEP 4: SAVE CATEGORIES (depending on message type)
+		//
+		$category_id = 0;
+		switch ($message_type)
         {
-            $incident_category = new Incident_Category_Model();
-            $incident_category->incident_id = $incident->id;
-            $incident_category->category_id = $categories->id;
-            $incident_category->save();           
-        }//endif
+            case (MessageParser::TYPE_LOCATION):
+            case (MessageParser::TYPE_CHECK_IN):
+                $category_id = $this->settings->cat_checkin;
+		        break;   
+            
+            case (MessageParser::TYPE_CHECKOUT):
+                $category_id = $this->settings->cat_checkout;
+		        break;   
+            
+            case (MessageParser::TYPE_HELP):
+                $category_id = $this->settings->cat_help;
+		        break;   
+            
+            case (MessageParser::TYPE_STATUS):
+                $category_id = $this->settings->cat_status;
+		        break;   
+
+            case (MessageParser::TYPE_ALL_CLEAR):
+                $category_id = $this->settings->cat_clear;
+		        break;   
+        }
+
+		//
+        ORM::factory('Incident_Category')->where('incident_id',$incident->id)->delete_all();		// Delete Previous Entries
+		if(is_numeric($category_id))
+		{
+			$incident_category = new Incident_Category_Model();
+			$incident_category->incident_id = $incident->id;
+			$incident_category->category_id = $category_id;
+			$incident_category->save();
+		}
 	}//endfunc
 }//endclass
 
