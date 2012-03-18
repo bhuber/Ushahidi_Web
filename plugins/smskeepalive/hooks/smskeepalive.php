@@ -21,7 +21,7 @@ class Geocoder
 		$ch = curl_init();
         $ccTLD = self::get_default_ccTLD();
         $url = 'http://maps.googleapis.com/maps/api/geocode/json?sensor=false&region='.$ccTLD.'&address='.urlencode($text);
-        //echo($url);
+        echo($url);
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, True);
 		$json = curl_exec($ch);
@@ -91,15 +91,15 @@ class smskeepalive
 	public function _parse_sms()
 	{
 		//the message
-		$raw_message = Event::$data->message;       //the raw string
-		$from = Event::$data->message_from;         //the phone number
-		$reporterId = Event::$data->reporter_id;    //primary key into reporter table
+		$raw_message = Event::$data->message; #the raw string
+		$from = Event::$data->message_from;#the phone number
+		$reporterId = Event::$data->reporter_id;
 		$message_date = Event::$data->message_date;
 		
 		$p = new MessageParser($raw_message,null,null);
-        $message_type = $p->getMessageType();
-		$message = $raw_message;		            //Actual message text
-        $userid = 0;
+	        $message_type = $p->getMessageType();
+      		#$message = $p->getMessage();
+		$message = $raw_message;		
 
 		//check to see if we're using the white list, and if so, if our SMSer is whitelisted
 		/*$num_whitelist = ORM::factory('smskeepalive_whitelist')
@@ -123,19 +123,12 @@ class smskeepalive
 
 		//echo Kohana::debug($message_elements);
 		$location_description = $p->getLocation();
-		$description = "Message text:\'".$message."\'\n\nThis reported was created automatically via SMS.";
-
+		
 		// STEP 0.9: GET LAT/LON FROM LOCATION	
 		$loc = Geocoder::lat_lon_from_text($location_description);
         $lat = $loc['lat'];
         $lon = $loc['lon'];
         $pretty_address = Util::get_or_get($loc['result']->results[0]->formatted_address, $location_description);
-        $got_location = true;
-        if ($lat == NULL || $lon == NULL)
-        {
-            $description = "\nCould not determine location from message".$description;
-            $got_location = false;
-        }
 
 		// STEP 1: SAVE LOCATION
 		$location = new Location_Model();
@@ -143,11 +136,12 @@ class smskeepalive
 		$location->latitude = $lat;
 		$location->longitude = $lon;
 		$location->location_date = $message_date;
-		$location->save();
-
-		//STEP 2: Save the incident
-		$incident = new Incident_Model();
+		$location->save();	
+				
+		$use_previous = false;
+		
         $last_location_id = $location->id;
+        $new_location_id = 0;
 		$last_message = ORM::factory('message')
             ->where(array('reporter_id' => $reporterId))
             ->orderby(array('message_date' => 'DESC'))
@@ -159,8 +153,9 @@ class smskeepalive
                 ->find();
             if ($last_incident->loaded == true)
             {
-                $last_location_id = $last_incident->location_id;
+                $new_location_id = $last_incident->location_id;
                 $incident = $last_incident;
+                $use_previous = true;	
             }
         }
             /*
@@ -171,30 +166,61 @@ class smskeepalive
             ->limit(10)
             */
         //TODO: location isn't using old version ($last_location_id) when not specified, figure out why
-		$incident->location_id = $got_location ? 
-            $location->id : $last_location_id;
-		$incident->user_id = $userid;
-		$incident->incident_title = $message;
-		$incident->incident_description = $description;
-		$incident->incident_date = $message_date;
-		$incident->incident_dateadd = date("Y-m-d H:i:s",time());
-		$incident->incident_mode = 2;
-		// Incident Evaluation Info
-		$incident->incident_active = 1;
-		$incident->incident_verified = 1;
-		$incident->save();
+		//$incident->location_id == $got_location ? 
+        //    $location->id : $last_location_id;
+		#$incident->user_id = $userid;
 
-		//STEP 2.1: don't forget to set incident_id in the message
-		Event::$data->incident_id = $incident->id;
-		Event::$data->save();
-		
-		//STEP 3: Record Approval
-		$verify = new Verify_Model();
-		$verify->incident_id = $incident->id;
-		$verify->user_id = 0;
-		$verify->verified_date = date("Y-m-d H:i:s",time());
-		$verify->verified_status = '3'; # active & verified
-		$verify->save();
+
+
+		//STEP 2: Save the incident
+		if ($use_previous)
+		{
+    		$description = $last_incident->incident_description;
+    		$description = $description."\n\r\n\rThis reported was automatically updated via SMS.";
+    		$description = $description.$message;
+    		if (strlen($location_description) > 0)
+    		{
+    		   $last_incident->location_id = $new_location_id;
+    		   $description = $description."\nUsing previous location";
+            }    
+		    $last_incident->incident_title = $message;
+        	$last_incident->incident_description = $description; 
+		    $last_incident->save();
+
+		}
+		else
+		{
+		    $description = $message."\n\r\n\rThis reported was automatically created via SMS.";
+
+		    $description = $description."\nLocation (lat, lon): ".$lat.' - '.$lon;
+    	
+		    $incident = new Incident_Model();
+		    $incident->location_id = $location->id;
+  		    $incident->user_id = 0;
+        	$incident->incident_title = $message;
+        	$incident->incident_description = $description;
+        	$incident->incident_date = $message_date;
+        	$incident->incident_dateadd = date("Y-m-d H:i:s",time());
+        	$incident->incident_mode = 2;
+        	// Incident Evaluation Info
+        	$incident->incident_active = 1;
+        	$incident->incident_verified = 1;		
+        	
+        	$incident->save();
+        
+        	//STEP 2.1: don't forget to set incident_id in the message
+        	Event::$data->incident_id = $incident->id;
+        	Event::$data->save();
+        	
+        	//STEP 3: Record Approval
+        	$verify = new Verify_Model();
+        	$verify->incident_id = $incident->id;
+        	$verify->user_id = 0;
+        	$verify->verified_date = date("Y-m-d H:i:s",time());
+        	$verify->verified_status = '3'; # active & verified
+        	$verify->save();
+        	
+		}
 		
 		// STEP 4: SAVE CATEGORIES (depending on message type)
 		//
