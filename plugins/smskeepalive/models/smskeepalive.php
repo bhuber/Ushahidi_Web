@@ -17,5 +17,5 @@ class smskeepalive_Model extends ORM
 {
 	
 	// Database table name
-	protected $table_name = 'smskeepalive3';
+	protected $table_name = 'smskeepalive';
 }

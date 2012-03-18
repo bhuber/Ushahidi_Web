@@ -36,7 +36,7 @@ class smskeepalive_Install {
         //ALL_CLEAR   one of "ac,clear,safe"
         //STATUS      one of "status, st"
 		// Also include table_prefix in name
-		$this->db->query('CREATE TABLE IF NOT EXISTS `'.Kohana::config('database.default.table_prefix').'smskeepalive3` (
+		$this->db->query('CREATE TABLE IF NOT EXISTS `'.Kohana::config('database.default.table_prefix').'smskeepalive` (
 				  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 				  `delimiter` varchar(1) NOT NULL,
 				  `code_word` varchar(11) NOT NULL,
