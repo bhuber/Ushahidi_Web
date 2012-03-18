@@ -13,29 +13,55 @@
  * @license	   http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
  */
 
-class Geocoder {
+class Geocoder
+{
 	/* Get lat and lon array from string using Google Geocoding API */
 	public function lat_lon_from_text($text)
 	{
 		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, 'http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address='.urlencode($text));
+        $ccTLD = self::get_default_ccTLD();
+		curl_setopt($ch, CURLOPT_URL, 'http://maps.googleapis.com/maps/api/geocode/json?sensor=false&gl='
+            .$ccTLD.'&address='.urlencode($text));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, True);
 		$json = curl_exec($ch);
 		curl_close($ch);
-		$lat = null;
-		$lon = null;
-		$result = json_decode($json);
+
+		$lat = NULL;
+		$lon = NULL;
+        $result = json_decode($json);
+        print_r(Kohana::config('settings.default_country'));
 		if(isset($result->results[0]->geometry))
 		{
 			$lat = $result->results[0]->geometry->location->lat;
 			$lon = $result->results[0]->geometry->location->lng;
-		}
-		return array($lat, $lon);
+        }
+
+		return array("lat" => $lat, "lon" => $lon, "result" => $result);
 	}
+
+    /* Gets the default country as a ccTLD (top level domain ICANN code)
+     */
+    public static function get_default_ccTLD()
+    {
+        $country = ORM::factory('country')
+            ->where('id', Kohana::config('settings.default_country')
+            ->find();
+        $iso = strtolower(Util::get_or_get($country[0]->iso, 'US'));
+        $ccTLD = $iso === 'gb' ? 'uk' : $iso;
+        return $ccTLD;
+    }
 }
 
-class smskeepalive {
-	
+public class Util
+{
+    public static function get_or_get(&$check, $alternate = NULL) 
+    { 
+            return (isset($check)) ? $check : $alternate; 
+    } 
+}
+
+class smskeepalive
+{
 	/**
 	 * Registers the main event add method
 	 */
@@ -100,11 +126,15 @@ class smskeepalive {
 		$description = $message."\n\r\n\rThis reported was created automatically via SMS.";
 
 		// STEP 0.9: GET LAT/LON FROM LOCATION	
-		list($lat, $lon) = Geocoder::lat_lon_from_text($location_description);
+		$loc = Geocoder::lat_lon_from_text($location_description);
+        $lat = $loc['lat'];
+        $lon = $loc['lon'];
+        $pretty_address = isset($loc['result']->results[0]->formatted_address) ? 
+            $loc['result']->results[0]->formatted_address : $location_description;
 
 		// STEP 1: SAVE LOCATION
 		$location = new Location_Model();
-		$location->location_name = $location_description;
+		$location->location_name = $pretty_address;
 		$location->latitude = $lat;
 		$location->longitude = $lon;
 		$location->location_date = $message_date;
