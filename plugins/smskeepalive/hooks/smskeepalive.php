@@ -71,7 +71,8 @@ class smskeepalive {
 		
 		$p = new MessageParser($raw_message,null,null);
 	        $message_type = $p->getMessageType();
-      		$message = $p->getMessage();
+      		#$message = $p->getMessage();
+		$message = $raw_message;		
 
 		//check to see if we're using the white list, and if so, if our SMSer is whitelisted
 		/*$num_whitelist = ORM::factory('smskeepalive_whitelist')
