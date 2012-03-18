@@ -1,5 +1,5 @@
 
-<h1> SMS Automate - Settings</h1>
+<h1> SMS Keep Alive - Settings</h1>
 <?php print form::open(); ?>
 
 	<?php if ($form_error) { ?>
