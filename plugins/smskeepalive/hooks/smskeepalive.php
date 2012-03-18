@@ -30,7 +30,6 @@ class Geocoder {
 			$lat = $result->results[0]->geometry->location->lat;
 			$lon = $result->results[0]->geometry->location->lng;
 		}
-		print_r(array($lat, $lon));
 		return array($lat, $lon);
 	}
 }

@@ -8,14 +8,8 @@ class twilio {
  
     public function add()
     {
-		plugin::add_sms_provider("twilio");
+	plugin::add_sms_provider("twilio");
     }
- 
-    public function twilio()
-    { # can prob get rid of this later
-	    View::factory('twilio/myhtml')->render(TRUE);
-    }
- 
 }
  
 //instatiation of hook
