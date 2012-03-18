@@ -124,7 +124,7 @@
                     {
                         $locationStartIndex=1;
                     }
-                    for ($i = $locationStartIndex; $i<=count($elements); $i++){
+                    for ($i = $locationStartIndex; $i<count($elements); $i++){
                         $this->location.=$elements[$i]." ";
                     }
                     $this->location=trim($this->location);

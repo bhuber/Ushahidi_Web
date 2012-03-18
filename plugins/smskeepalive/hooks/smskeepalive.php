@@ -18,13 +18,21 @@ class Geocoder {
 	public function lat_lon_from_text($text)
 	{
 		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, 'http://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($text));
+		curl_setopt($ch, CURLOPT_URL, 
+            'http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address='.urlencode($text));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, True);
 		$json = curl_exec($ch);
 		curl_close($ch);
 		$result = json_decode($json);
-		$lat = $result->results->geometry->location->lat;
-		$lon = $result->results->geometry->location->lng;
+        //print_r($result);
+        $lat = NULL;
+        $lon = NULL;
+
+        if (isset($result->results->geometry->location))
+        {
+            $lat = $result->results->geometry->location->lat;
+            $lon = $result->results->geometry->location->lng;
+        }
 		return array($lat, $lon);
 	}
 }
@@ -133,7 +141,7 @@ class smskeepalive {
 		
 		// STEP 4: SAVE CATEGORIES (get from parser)
         $categories = ORM::factory("category")
-            ->where($message_type, 1)
+            ->where('category_title', $message_type)
             ->find();
         if($categories->loaded)
         {
