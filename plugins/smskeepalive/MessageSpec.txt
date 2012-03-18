@@ -8,7 +8,7 @@ Message Types:
 
 Message Parts:
 1. Type specifier - Specifies the type of the message
-2. Idntity Specifier - Specifies the identity of the sender
+2. Identity Specifier - Specifies the identity of the sender
 3. Location Specifier - Specify the location of the sender
 4. Password - Specify the password
 5. Message - Specifies details

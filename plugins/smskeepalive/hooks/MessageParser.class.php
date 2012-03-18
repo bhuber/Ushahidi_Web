@@ -70,6 +70,7 @@
 
 
         public function __construct($message, $camefrom, $wentto){
+            $this->raw_message = $message;
             $elements = explode(" ", $message);
             $this->message_type = self::find_message_type($elements[0]);
             if (!$this->message_type){
@@ -100,6 +101,7 @@
                     //Miniumum number of elements is 2
                     if (count($elements) < 2)
 						throw new Exception(self::ERROR_MISSING_ELEMENTS);
+
                     if ($elements[1] && preg_match(self::REGEX_IDENTITY, $elements[1]))
                     { 
                         $this->identifier = $elements[1];
@@ -109,9 +111,14 @@
                     {
                         $locationStartIndex = 1;
                     }
-                    $passwordIndex = count($elements)-1;
+
+                    //removing password for now since we don't have it in the db model
+                    /*
+                    $passwordIndex = count($elements) - 1;
                     $this->password = $elements[$passwordIndex];
-                    for ($i=$locationStartIndex; $i<$passwordIndex; $i++)
+                    for ($i = $locationStartIndex; $i < $passwordIndex; $i++)
+                    */
+                    for ($i = $locationStartIndex; $i < count($elements); $i++)
                     {
                         $this->location .= $elements[$i]." ";
                     }
@@ -128,7 +135,8 @@
                     {
                         $locationStartIndex = 1;
                     }
-                    for ($i = $locationStartIndex; $i<count($elements); $i++){
+                    for ($i = $locationStartIndex; $i < count($elements); $i++)
+                    {
                         $this->location .= $elements[$i]." ";
                     }
                     $this->location = trim($this->location);
